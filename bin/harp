@@ -98,19 +98,23 @@ program
 
 program
   .command("multihost [path]")
+  .option("-i, --ip <ip>", "Specify IP to bind to")
   .option("-p, --port <port>", "Specify a port to listen on")
   .usage("starts a Harp server to host a directory of Harp projects.")
   .description("Start a Harp server to host a directory of Harp projects")
   .action(function(path, program){
     var projectPath = nodePath.resolve(process.cwd(), path || "")
+    var ip          = program.ip || '0.0.0.0'
     var port        = program.port || 9000
-    harp.multihost(projectPath, { port: port }, function(){
-      if(port == "80"){
-        var loc = "http://harp.nu"
-      }else{
-        var loc = "http://harp.nu:" + port
+    harp.multihost(projectPath, { ip: ip, port: port }, function(){
+      var address = ''
+      if(ip == '0.0.0.0' || ip == '127.0.0.1') {
+        address = 'localhost'
+      } else {
+        address = ip
       }
-      output("Your server is hosting multiple projects at " + loc)
+      var hostUrl = "http://" + address + ":" + port + "/"
+      output("Your server is hosting multiple projects at " + hostUrl)
     })
   })
 
